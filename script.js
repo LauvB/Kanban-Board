@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const taskText = taskInput.value.trim();
     if (!taskText) {
-      warningMessage.textContent = "Please enter a task name.";
+      warningMessage.textContent = "Please enter a task name or description.";
       warningMessage.style.display = "block";
       return;
     }
@@ -30,19 +30,30 @@ document.addEventListener("DOMContentLoaded", () => {
     taskDiv.setAttribute("data-date", date);
     taskDiv.setAttribute("data-priority", priority);
     taskDiv.innerHTML = `
-        <span>${taskText}</span>
+        <div class="task-title">
+          <span>${taskText}</span>
+          <div class="task-actions">
+            <button class="edit-btn">✏️</button>
+            <button class="delete-btn">🗑️</button>
+          </div>
+        </div>
         <div class="meta">
             <small>${date}</small>
             <span>${"🩷".repeat(priority)}</span>
         </div>
         `;
 
+    // Drag event
     taskDiv.addEventListener("dragstart", (e) => {
       selected = taskDiv;
     });
 
+    // Delete task
+    deleteTask(taskDiv);
+
     taskList.appendChild(taskDiv);
     taskInput.value = "";
+    document.getElementById("task-date").value = "";
 
     sortTasksByDateAndPriority(taskList);
   };
@@ -100,4 +111,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     tasks.forEach((task) => container.appendChild(task));
   }
+
+  let taskToDelete = null;
+
+  function deleteTask(taskDiv) {
+    taskDiv.querySelector(".delete-btn").addEventListener("click", () => {
+      taskToDelete = taskDiv;
+      document.getElementById("delete-popup").classList.remove("hidden");
+    });
+  }
+
+  // Confirm and cancel buttons
+  document.getElementById("confirm-delete").addEventListener("click", () => {
+    if (taskToDelete) {
+      taskToDelete.remove();
+      taskToDelete = null;
+    }
+    document.getElementById("delete-popup").classList.add("hidden");
+  });
+
+  document.getElementById("cancel-delete").addEventListener("click", () => {
+    taskToDelete = null;
+    document.getElementById("delete-popup").classList.add("hidden");
+  });
 });
