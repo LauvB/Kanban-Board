@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     taskList.appendChild(taskDiv);
     taskInput.value = "";
+
     sortTasksByDateAndPriority(taskList);
   };
 
@@ -68,6 +69,10 @@ document.addEventListener("DOMContentLoaded", () => {
         container.querySelector(".list")?.appendChild(selected) ||
           container.appendChild(selected);
         updateTaskColor(selected, container.id);
+
+        const listContainer = container.querySelector(".list") || container;
+        sortTasksByDateAndPriority(listContainer);
+
         selected = null;
       }
     });
@@ -78,5 +83,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (columnId === "to-do") taskDiv.classList.add("todo-color");
     else if (columnId === "progress") taskDiv.classList.add("progress-color");
     else if (columnId === "done") taskDiv.classList.add("done-color");
+  }
+
+  function sortTasksByDateAndPriority(container) {
+    const tasks = Array.from(container.querySelectorAll(".list-item"));
+    tasks.sort((a, b) => {
+      const dateA = new Date(a.getAttribute("data-date") || "9999-12-31");
+      const dateB = new Date(b.getAttribute("data-date") || "9999-12-31");
+      const priorityA = parseInt(a.getAttribute("data-priority"));
+      const priorityB = parseInt(b.getAttribute("data-priority"));
+
+      // Closest date first, then highest priority
+      if (dateA - dateB !== 0) return dateA - dateB;
+      return priorityB - priorityA;
+    });
+
+    tasks.forEach((task) => container.appendChild(task));
   }
 });
