@@ -51,6 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Delete task
     deleteTask(taskDiv);
 
+    // Edit task
+    editTask(taskDiv);
+
     taskList.appendChild(taskDiv);
     taskInput.value = "";
     document.getElementById("task-date").value = "";
@@ -133,5 +136,65 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("cancel-delete").addEventListener("click", () => {
     taskToDelete = null;
     document.getElementById("delete-popup").classList.add("hidden");
+  });
+
+  let taskToEdit = null;
+
+  function editTask(taskDiv) {
+    taskDiv.querySelector(".edit-btn").addEventListener("click", () => {
+      taskToEdit = taskDiv;
+
+      // Obtener valores actuales
+      const taskName = taskDiv.querySelector(".task-title span").innerText;
+      const date = taskDiv.getAttribute("data-date") || "";
+      const priority = taskDiv.getAttribute("data-priority");
+
+      // Rellenar popup
+      document.getElementById("edit-task-name").value = taskName;
+      document.getElementById("edit-task-date").value = date;
+      document.getElementById("edit-task-priority").value = priority;
+
+      document.getElementById("edit-popup").classList.remove("hidden");
+    });
+  }
+
+  // Confirmar edición
+  document.getElementById("confirm-edit").addEventListener("click", () => {
+    if (taskToEdit) {
+      const newName = document.getElementById("edit-task-name").value.trim();
+      const newDate = document.getElementById("edit-task-date").value;
+      const newPriority = parseInt(
+        document.getElementById("edit-task-priority").value
+      );
+
+      if (!newName) {
+        alert("Task name cannot be empty.");
+        return;
+      }
+
+      taskToEdit.querySelector(".task-title span").innerText = newName;
+      taskToEdit.querySelector(".meta small").innerText = newDate;
+      taskToEdit.querySelector(".meta span").innerText = "🩷".repeat(
+        newPriority
+      );
+
+      taskToEdit.setAttribute("data-date", newDate);
+      taskToEdit.setAttribute("data-priority", newPriority);
+
+      taskToEdit = null;
+      document.getElementById("edit-popup").classList.add("hidden");
+
+      // Reordenar tareas si es necesario
+      const parentList = taskToEdit?.parentElement;
+      if (parentList?.classList.contains("list")) {
+        sortTasksByDateAndPriority(parentList);
+      }
+    }
+  });
+
+  // Cancelar edición
+  document.getElementById("cancel-edit").addEventListener("click", () => {
+    taskToEdit = null;
+    document.getElementById("edit-popup").classList.add("hidden");
   });
 });

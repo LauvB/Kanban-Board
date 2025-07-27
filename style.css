@@ -179,11 +179,34 @@ h2 {
 }
 
 .popup-content {
-  background: white;
+  background: #fff;
   padding: 20px 30px;
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.popup-content p {
+  margin-bottom: 10px;
+}
+
+.edit-input {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.edit-input label {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+input,
+select {
+  width: 100%;
 }
 
 .confirm-btn,
@@ -193,6 +216,7 @@ h2 {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .confirm-btn {

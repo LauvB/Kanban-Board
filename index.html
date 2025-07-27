@@ -64,5 +64,28 @@
         <button id="cancel-delete" class="cancel-btn">No</button>
       </div>
     </div>
+
+    <!-- Edit Task Popup -->
+    <div id="edit-popup" class="popup hidden">
+      <div class="popup-content">
+        <h2>Edit Task</h2>
+        <div class="edit-input">
+          <label> Task:</label>
+          <input type="text" id="edit-task-name" />
+          <label> Deadline:</label>
+          <input type="date" id="edit-task-date" />
+          <label> Priority: </label>
+          <select id="edit-task-priority">
+            <option value="3">🩷🩷🩷</option>
+            <option value="2">🩷🩷</option>
+            <option value="1">🩷</option>
+          </select>
+        </div>
+        <div class="popup-buttons">
+          <button class="confirm-btn" id="confirm-edit">Save</button>
+          <button class="cancel-btn" id="cancel-edit">Cancel</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
