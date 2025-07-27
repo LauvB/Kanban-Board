@@ -4,6 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const taskList = document.getElementById("list");
   const warningMessage = document.getElementById("task-warning");
 
+  const to_do = document.getElementById("to-do");
+  const progress = document.getElementById("progress");
+  const done = document.getElementById("done");
+
   let selected = null;
 
   // Add task in to do list
@@ -53,4 +57,26 @@ document.addEventListener("DOMContentLoaded", () => {
   taskInput.addEventListener("input", () => {
     warningMessage.style.display = "none";
   });
+
+  [to_do, progress, done].forEach((container) => {
+    container.addEventListener("dragover", (e) => {
+      e.preventDefault();
+    });
+
+    container.addEventListener("drop", (e) => {
+      if (selected) {
+        container.querySelector(".list")?.appendChild(selected) ||
+          container.appendChild(selected);
+        updateTaskColor(selected, container.id);
+        selected = null;
+      }
+    });
+  });
+
+  function updateTaskColor(taskDiv, columnId) {
+    taskDiv.classList.remove("todo-color", "progress-color", "done-color");
+    if (columnId === "to-do") taskDiv.classList.add("todo-color");
+    else if (columnId === "progress") taskDiv.classList.add("progress-color");
+    else if (columnId === "done") taskDiv.classList.add("done-color");
+  }
 });

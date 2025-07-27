@@ -125,3 +125,18 @@ h2 {
   align-items: end;
   justify-content: space-between;
 }
+
+.todo-color {
+  background-color: #ffeaa7;
+  color: #8a6d00;
+}
+
+.progress-color {
+  background-color: #9cd9ff;
+  color: #1b4f72;
+}
+
+.done-color {
+  background-color: #beff9e;
+  color: #27632a;
+}
