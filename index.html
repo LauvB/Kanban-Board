@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kanban Board</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="to-do-container">
+      <h1>Kanban Board</h1>
+      <!-- Section to add tasks -->
+      <div class="task-inputs-container">
+        <div class="task-inputs">
+          <div class="input-group">
+            <label for="task-input">Task</label>
+            <input type="text" id="task-input" placeholder="Add a new task" />
+          </div>
+
+          <div class="input-group">
+            <label for="task-date">Deadline</label>
+            <input type="date" id="task-date" />
+          </div>
+
+          <div class="input-group">
+            <label for="task-priority">Priority</label>
+            <select id="task-priority">
+              <option value="3">🩷🩷🩷</option>
+              <option value="2">🩷🩷</option>
+              <option value="1">🩷</option>
+            </select>
+          </div>
+
+          <button type="submit" id="add-task-btn">+</button>
+        </div>
+
+        <div id="task-warning" class="warning" style="display: none"></div>
+      </div>
+
+      <!-- Kanban Board -->
+      <div class="board">
+        <div class="column" id="to-do">
+          <h2>To Do</h2>
+          <div class="list" id="list"></div>
+        </div>
+        <div class="column" id="progress">
+          <h2>In Progress</h2>
+          <div class="list"></div>
+        </div>
+        <div class="column" id="done">
+          <h2>Done</h2>
+          <div class="list"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
