@@ -1,16 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Prevent the user from choosing a past date
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("task-date").setAttribute("min", today);
+
   const taskInput = document.getElementById("task-input");
   const addTaskBtn = document.getElementById("add-task-btn");
-  const taskList = document.getElementById("list");
   const warningMessage = document.getElementById("task-warning");
 
   const to_do = document.getElementById("to-do");
   const progress = document.getElementById("progress");
   const done = document.getElementById("done");
 
-  let selected = null;
+  let selected = null; // Currently dragged task
 
-  // Add task in to do list
+  // Load tasks from localStorage
+  const loadTasksFromStorage = () => {
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    tasks.forEach((task) => {
+      createTaskFromData(task);
+    });
+  };
+
+  // Save a task to localStorage
+  const saveTaskToStorage = (taskObj) => {
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    tasks.push(taskObj);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  };
+
+  // Handle task submission from the input field
   const addTask = (event) => {
     event.preventDefault();
 
@@ -24,14 +42,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = document.getElementById("task-date").value;
     const priority = parseInt(document.getElementById("task-priority").value);
 
+    const taskObj = {
+      id: Date.now().toString(), // Unique ID for the task
+      name: taskText,
+      date,
+      priority,
+      status: "to-do",
+    };
+
+    createTaskFromData(taskObj);
+    saveTaskToStorage(taskObj);
+
+    taskInput.value = "";
+    document.getElementById("task-date").value = "";
+
+    [to_do, progress, done].forEach((container) => {
+      sortTasksByDateAndPriority(container.querySelector(".list"));
+    });
+  };
+
+  // Create task from data
+  const createTaskFromData = ({ id, name, date, priority, status }) => {
     const taskDiv = document.createElement("div");
     taskDiv.classList.add("list-item");
     taskDiv.setAttribute("draggable", "true");
+    taskDiv.setAttribute("data-id", id);
     taskDiv.setAttribute("data-date", date);
     taskDiv.setAttribute("data-priority", priority);
     taskDiv.innerHTML = `
         <div class="task-title">
-          <span>${taskText}</span>
+          <span>${name}</span>
           <div class="task-actions">
             <button class="edit-btn">✏️</button>
             <button class="delete-btn">🗑️</button>
@@ -54,13 +94,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // Edit task
     editTask(taskDiv);
 
-    taskList.appendChild(taskDiv);
-    taskInput.value = "";
-    document.getElementById("task-date").value = "";
+    const container =
+      status === "progress" ? progress : status === "done" ? done : to_do;
 
-    sortTasksByDateAndPriority(taskList);
+    container.querySelector(".list").appendChild(taskDiv);
+    updateTaskColor(taskDiv, status);
+
+    [to_do, progress, done].forEach((container) => {
+      sortTasksByDateAndPriority(container.querySelector(".list"));
+    });
   };
 
+  // Add event listeners for adding tasks
   addTaskBtn.addEventListener("click", addTask);
 
   taskInput.addEventListener("keypress", (e) => {
@@ -73,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     warningMessage.style.display = "none";
   });
 
+  // Handle drag and drop between columns
   [to_do, progress, done].forEach((container) => {
     container.addEventListener("dragover", (e) => {
       e.preventDefault();
@@ -87,11 +133,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const listContainer = container.querySelector(".list") || container;
         sortTasksByDateAndPriority(listContainer);
 
+        updateStorage();
+
         selected = null;
       }
     });
   });
 
+  // Update task background color based on its column
   function updateTaskColor(taskDiv, columnId) {
     taskDiv.classList.remove("todo-color", "progress-color", "done-color");
     if (columnId === "to-do") taskDiv.classList.add("todo-color");
@@ -117,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let taskToDelete = null;
 
+  // Add delete behavior to a task
   function deleteTask(taskDiv) {
     taskDiv.querySelector(".delete-btn").addEventListener("click", () => {
       taskToDelete = taskDiv;
@@ -124,15 +174,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Confirm and cancel buttons
+  // Confirm delete button
   document.getElementById("confirm-delete").addEventListener("click", () => {
     if (taskToDelete) {
       taskToDelete.remove();
       taskToDelete = null;
+      updateStorage();
     }
     document.getElementById("delete-popup").classList.add("hidden");
   });
 
+  // Cancel delete button
   document.getElementById("cancel-delete").addEventListener("click", () => {
     taskToDelete = null;
     document.getElementById("delete-popup").classList.add("hidden");
@@ -140,16 +192,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let taskToEdit = null;
 
+  // Add edit behavior to a task
   function editTask(taskDiv) {
     taskDiv.querySelector(".edit-btn").addEventListener("click", () => {
       taskToEdit = taskDiv;
 
-      // Obtener valores actuales
+      // Get current values
       const taskName = taskDiv.querySelector(".task-title span").innerText;
       const date = taskDiv.getAttribute("data-date") || "";
       const priority = taskDiv.getAttribute("data-priority");
 
-      // Rellenar popup
+      // Populate edit popup with current values
       document.getElementById("edit-task-name").value = taskName;
       document.getElementById("edit-task-date").value = date;
       document.getElementById("edit-task-priority").value = priority;
@@ -158,7 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Confirmar edición
+  // Confirm task edit
   document.getElementById("confirm-edit").addEventListener("click", () => {
     if (taskToEdit) {
       const newName = document.getElementById("edit-task-name").value.trim();
@@ -181,20 +234,46 @@ document.addEventListener("DOMContentLoaded", () => {
       taskToEdit.setAttribute("data-date", newDate);
       taskToEdit.setAttribute("data-priority", newPriority);
 
+      const parentList = taskToEdit?.parentElement;
       taskToEdit = null;
       document.getElementById("edit-popup").classList.add("hidden");
 
-      // Reordenar tareas si es necesario
-      const parentList = taskToEdit?.parentElement;
+      // Reorder tasks if necessary
       if (parentList?.classList.contains("list")) {
         sortTasksByDateAndPriority(parentList);
       }
+
+      updateStorage();
     }
   });
 
-  // Cancelar edición
+  // Cancel edit button
   document.getElementById("cancel-edit").addEventListener("click", () => {
     taskToEdit = null;
     document.getElementById("edit-popup").classList.add("hidden");
   });
+
+  // Update all tasks in localStorage based on current DOM state
+  function updateStorage() {
+    const allTasks = [];
+
+    [to_do, progress, done].forEach((container) => {
+      const status = container.id;
+      const tasks = container.querySelectorAll(".list-item");
+      tasks.forEach((task) => {
+        allTasks.push({
+          id: task.getAttribute("data-id"),
+          name: task.querySelector(".task-title span").innerText,
+          date: task.getAttribute("data-date"),
+          priority: parseInt(task.getAttribute("data-priority")),
+          status,
+        });
+      });
+    });
+
+    localStorage.setItem("tasks", JSON.stringify(allTasks));
+  }
+
+  // Initialize task board
+  loadTasksFromStorage();
 });

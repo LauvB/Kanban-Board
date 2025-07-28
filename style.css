@@ -119,6 +119,9 @@ h2 {
   cursor: grab;
   border-radius: 50px;
   color: #945e07;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .list-item .meta {
@@ -147,6 +150,11 @@ h2 {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 5px;
+}
+
+.task-title span {
+  flex: 1;
+  overflow: hidden;
 }
 
 .task-actions button {
