@@ -48,7 +48,8 @@ git clone https://github.com/LauvB/Kanban-Board.git
 
 ## 📎 Demo
 
-coming soon...
+You can try the live version here:  
+👉 [Kanban Task Manager Live Demo](https://lauvb.github.io/Kanban-Board/)
 
 ## 👩‍💻 Author
 
