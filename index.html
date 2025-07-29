@@ -69,11 +69,12 @@
     <div id="edit-popup" class="popup hidden">
       <div class="popup-content">
         <h2>Edit Task</h2>
+        <div id="task-edit-warning" class="warning" style="display: none"></div>
         <div class="edit-input">
           <label> Task:</label>
           <input type="text" id="edit-task-name" />
           <label> Deadline:</label>
-          <input type="date" id="edit-task-date" />
+          <input type="date" id="edit-task-date" min="" />
           <label> Priority: </label>
           <select id="edit-task-priority">
             <option value="3">🩷🩷🩷</option>

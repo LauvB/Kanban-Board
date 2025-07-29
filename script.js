@@ -2,10 +2,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Prevent the user from choosing a past date
   const today = new Date().toISOString().split("T")[0];
   document.getElementById("task-date").setAttribute("min", today);
+  document.getElementById("edit-task-date").setAttribute("min", today);
 
   const taskInput = document.getElementById("task-input");
   const addTaskBtn = document.getElementById("add-task-btn");
   const warningMessage = document.getElementById("task-warning");
+  const editTaskNameInput = document.getElementById("edit-task-name");
+  const warningEditMessage = document.getElementById("task-edit-warning");
 
   const to_do = document.getElementById("to-do");
   const progress = document.getElementById("progress");
@@ -196,6 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function editTask(taskDiv) {
     taskDiv.querySelector(".edit-btn").addEventListener("click", () => {
       taskToEdit = taskDiv;
+      warningEditMessage.style.display = "none";
 
       // Get current values
       const taskName = taskDiv.querySelector(".task-title span").innerText;
@@ -221,7 +225,8 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       if (!newName) {
-        alert("Task name cannot be empty.");
+        warningEditMessage.textContent = "Task field cannot be empty.";
+        warningEditMessage.style.display = "block";
         return;
       }
 
@@ -245,6 +250,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateStorage();
     }
+  });
+
+  editTaskNameInput.addEventListener("input", () => {
+    warningEditMessage.style.display = "none";
   });
 
   // Cancel edit button
